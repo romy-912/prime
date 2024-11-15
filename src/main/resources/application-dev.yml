@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: dev-prime
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://127.0.0.1:3306/prime
+    username: app
+    password: qweasdzxc!@#
+    hikari:
+      connection-timeout: 3000
+      validation-timeout: 3000
+      minimum-idle: 5
+      max-lifetime: 240000
+      maximum-pool-size: 20
+      auto-commit: false

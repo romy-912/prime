@@ -1,0 +1,36 @@
+server:
+  port: 8888
+
+# swagger
+springdoc:
+  default-produces-media-type: application/json
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    default-models-expand-depth: -1
+
+spring:
+  application:
+    name: prime
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallbackToSystemLocale: false
+    alwaysUseMessageFormat: true
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  servlet:
+    multipart:
+      file-size-threshold: 100MB
+      location: /Temp
+      max-file-size: 100MB
+      max-request-size: 500MB
+
+# log 설정
+logging:
+  config: classpath:log4j2.xml
+  file:
+    max-history: 60

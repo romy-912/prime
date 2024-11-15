@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.romy.prime.organization.repository.OrgUserRepository">
+
+
+    <select id="selectUserInfoByEmpNo" resultType="com.romy.prime.organization.dvo.OrgUserDvo">
+        SELECT EMP_NO       /* 사원번호 */
+             , EMP_NM       /* 성명 */
+             , DEPT_CD      /* 부서코드 */
+             , ROLE_ID      /* 권한ID */
+             , LOCK_YN      /* 잠금여부 */
+             , PW_INIT_YN   /* 비밀번호초기화여부 */
+             , PASSWORD     /* 비밀번호 */
+          FROM ORG_USER   /* 사용자 */
+         WHERE USE_YN = 1
+           AND EMP_NO = #{empNo}   /* 사원번호 */
+    </select>
+
+    <update id="updatePasswordInvalid">
+        UPDATE ORG_USER   /* 사용자 */
+           SET PW_ERR_CNT = PW_ERR_CNT + 1
+             , LOCK_YN    = CASE WHEN PW_ERR_CNT + 1 > 5 THEN 1
+                                 ELSE 0
+                            END
+        <include refid="common.sql.updateSystemColumn" />
+         WHERE EMP_NO = #{empNo}
+    </update>
+
+    <update id="updateUserPassword">
+        UPDATE ORG_USER   /* 사용자 */
+           SET PASSWORD   = #{password}   /* 비밀번호 */
+             , PW_INIT_YN = #{pwInitYn}   /* 비밀번호초기화여부 */
+        <include refid="common.sql.updateSystemColumn" />
+         WHERE EMP_NO = #{empNo}
+    </update>
+
+    <select id="selectUserList" resultType="com.romy.prime.organization.dto.OrgUserMgtDto$SearchRes">
+        SELECT D1.EMP_NO       /* 사원번호 */
+             , D1.EMP_NM       /* 성명 */
+             , D1.DEPT_CD      /* 부서코드 */
+             , D1.ROLE_ID      /* 권한ID */
+             , D1.USE_YN       /* 사용여부 */
+             , D1.LOCK_YN      /* 잠금여부 */
+             , D1.PW_INIT_YN   /* 비밀번호초기화여부 */
+             , D1.PW_ERR_CNT   /* 비밀번호오류횟수 */
+             , D1.REMARK       /* 비고 */
+          FROM ORG_USER D1              /* 사용자 */
+          LEFT OUTER JOIN ORG_DEPT D2   /* 부서 */
+            ON D2.DEPT_CD = D1.DEPT_CD
+    <where>
+    <if test="empNo != null and empNo != ''">
+           AND D1.EMP_NO LIKE CONCAT(#{empNo}, '%')          /* 사원번호 */
+    </if>
+    <if test="empNm != null and empNm != ''">
+           AND D1.EMP_NM LIKE CONCAT('%', #{empNm}, '%')     /* 성명 */
+    </if>
+    <if test="deptNm != null and deptNm != ''">
+           AND D2.DEPT_NM LIKE CONCAT('%', #{deptNm}, '%')   /* 부서명 */
+    </if>
+    <if test="useYn != null">
+           AND D1.USE_YN = #{useYn}                      /* 사용여부 */
+    </if>
+    </where>
+         ORDER BY D1.EMP_NO
+    </select>
+
+    <select id="selectEmpNoDupCheck" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+          FROM ORG_USER   /* 사용자 */
+         WHERE EMP_NO = #{empNo}
+    </select>
+
+    <insert id="insertUser">
+        INSERT INTO ORG_USER   /* 사용자 */
+             (
+               EMP_NO       /* 사원번호 */
+             , EMP_NM       /* 성명 */
+             , DEPT_CD      /* 부서코드 */
+             , PASSWORD     /* 비밀번호 */
+             , ROLE_ID      /* 권한ID */
+             , USE_YN       /* 사용여부 */
+             , LOCK_YN      /* 잠금여부 */
+             , PW_INIT_YN   /* 비밀번호 초기화 여부 */
+             , PW_ERR_CNT   /* 비밀번호 오류횟수 */
+             , REMARK       /* 비고 */
+        <include refid="common.sql.insertSystemField" />
+             )
+        VALUES
+             (
+               #{empNo}      /* 사원번호 */
+             , #{empNm}      /* 성명 */
+             , #{deptCd}     /* 부서코드 */
+             , #{password}   /* 비밀번호 */
+             , #{roleId}     /* 권한ID */
+             , #{useYn}      /* 사용여부 */
+             , #{lockYn}     /* 잠금여부 */
+             , #{pwInitYn}   /* 비밀번호 초기화 여부 */
+             , #{pwErrCnt}   /* 비밀번호 오류횟수 */
+             , #{remark}     /* 비고 */
+        <include refid="common.sql.insertSystemValue" />
+             )
+    </insert>
+
+    <update id="updateUser">
+        UPDATE ORG_USER   /* 사용자 */
+           SET EMP_NM     = #{empNm}      /* 성명 */
+             , USE_YN     = #{useYn}      /* 사용여부 */
+             , PW_ERR_CNT = #{pwErrCnt}   /* 비밀번호 오류횟수 */
+        <if test="deptCd != null">
+             , DEPT_CD    = #{deptCd}     /* 부서코드 */
+        </if>
+        <if test="roleId != null">
+             , ROLE_ID    = #{roleId}     /* 권한ID */
+        </if>
+        <if test="remark != null">
+             , REMARK     = #{remark}     /* 비고 */
+        </if>
+        <include refid="common.sql.updateSystemColumn" />
+         WHERE EMP_NO = #{empNo}
+    </update>
+
+    <delete id="deleteUser">
+        DELETE
+          FROM ORG_USER   /* 사용자 */
+         WHERE EMP_NO = #{empNo}
+    </delete>
+
+    <update id="updatePasswordInit">
+        UPDATE ORG_USER   /* 사용자 */
+           SET PASSWORD   = #{password}   /* 비밀번호 */
+             , PW_INIT_YN = #{pwInitYn}   /* 비밀번호초기화여부 */
+             , LOCK_YN    = #{lockYn}     /* 잠금여부 */
+             , PW_ERR_CNT = #{pwErrCnt}   /* 비밀번호오류횟수 */
+        <include refid="common.sql.updateSystemColumn" />
+         WHERE EMP_NO = #{empNo}
+    </update>
+
+
+</mapper>

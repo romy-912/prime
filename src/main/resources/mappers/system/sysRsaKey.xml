@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.romy.prime.system.repository.SysRsaKeyRepository">
+
+    <insert id="insertRsaKey">
+        INSERT INTO SYS_RSA_KEY
+             (
+               SESSION_KEY   /* 세션키 */
+             , PRIVATE_KEY   /* 개인키 */
+             , CRT_DTHR      /* 생성일시 */
+             )
+        VALUES
+             (
+               #{sessionKey}   /* 세션키 */
+             , #{privateKey}   /* 개인키 */
+             , #{crtDthr}      /* 생성일시 */
+             )
+    </insert>
+
+    <select id="selectPrivateKey" resultType="java.lang.String">
+        SELECT PRIVATE_KEY   /* 개인키 */
+          FROM SYS_RSA_KEY   /* 암호화키 */
+         WHERE SESSION_KEY = #{sessionKey}   /* 세션키 */
+    </select>
+
+    <delete id="deleteRsaKey">
+        DELETE
+          FROM SYS_RSA_KEY
+         WHERE SESSION_KEY = #{sessionKey}
+    </delete>
+
+</mapper>

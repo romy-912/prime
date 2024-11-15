@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.romy.prime.system.repository.SysConfigRepository">
+
+    <select id="selectCryptInfo" resultType="com.romy.prime.system.dvo.SysCryptDvo">
+        SELECT MAX(CASE WHEN CONFIG_CD = 'S' THEN CONFIG_VALUE END) AS SALT
+             , MAX(CASE WHEN CONFIG_CD = 'I' THEN CONFIG_VALUE END) AS INTER_NUM
+          FROM SYS_CONFIG   /* 설정 */
+         WHERE CONFIG_CD IN ('S', 'I')   /* Salt, InterNum*/
+    </select>
+
+</mapper>
