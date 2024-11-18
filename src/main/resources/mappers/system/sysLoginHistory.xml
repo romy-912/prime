@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.romy.prime.system.repository.SysLoginHistoryRepository">
+
+    <insert id="insertLoginHistory">
+        INSERT INTO SYS_LOGIN_HISTORY
+             (
+               EMP_NO       /* 사번 */
+             , LOGIN_DTHR   /* 로그인일시 */
+             )
+        VALUES
+             (
+               #{empNo}       /* 사번 */
+             , #{loginDthr}   /* 로그인일시 */
+             )
+    </insert>
+
+
+</mapper>

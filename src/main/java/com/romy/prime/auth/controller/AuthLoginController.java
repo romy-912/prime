@@ -37,10 +37,10 @@ public class AuthLoginController {
         return this.authLoginService.createEncryptionKey();
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     @Operation(summary = "로그인")
-    public LoginRes execAuthLogin(@Valid LoginReq dto) throws Exception {
-        return this.authLoginService.execAuthLogin(dto);
+    public LoginRes saveAuthLogin(@RequestBody @Valid LoginReq dto) throws Exception {
+        return this.authLoginService.saveAuthLogin(dto);
     }
 
     @PutMapping("/user/password")

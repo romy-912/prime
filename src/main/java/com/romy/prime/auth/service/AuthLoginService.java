@@ -1,7 +1,5 @@
 package com.romy.prime.auth.service;
 
-import static com.romy.prime.auth.dto.AuthLoginDto.*;
-
 import com.romy.prime.common.PrimeConstant;
 import com.romy.prime.common.encrypt.PRIME_CRYPT_HASH;
 import com.romy.prime.common.encrypt.RSA;
@@ -12,8 +10,10 @@ import com.romy.prime.common.utils.PrimeUtils;
 import com.romy.prime.organization.dvo.OrgUserDvo;
 import com.romy.prime.organization.repository.OrgUserRepository;
 import com.romy.prime.system.dvo.SysCryptDvo;
+import com.romy.prime.system.dvo.SysLoginHistoryDvo;
 import com.romy.prime.system.dvo.SysRsaKeyDvo;
 import com.romy.prime.system.repository.SysConfigRepository;
+import com.romy.prime.system.repository.SysLoginHistoryRepository;
 import com.romy.prime.system.repository.SysRsaKeyRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
+import static com.romy.prime.auth.dto.AuthLoginDto.*;
 
 /**
  * packageName    : com.romy.prime.auth.service
@@ -43,6 +45,7 @@ public class AuthLoginService {
     private final OrgUserRepository orgUserRepository;
     private final SysRsaKeyRepository sysRsaKeyRepository;
     private final SysConfigRepository sysConfigRepository;
+    private final SysLoginHistoryRepository sysLoginHistoryRepository;
 
     /**
      * 암호화 키 발급
@@ -72,7 +75,7 @@ public class AuthLoginService {
      * @param dto 로그인 파라미터
      * @return 토큰 데이터
      */
-    public LoginRes execAuthLogin(LoginReq dto) throws Exception {
+    public LoginRes saveAuthLogin(LoginReq dto) throws Exception {
         // 암호화 사원번호
         String encEmpNo = dto.id();
         // 암호화 비밀번호
@@ -124,6 +127,11 @@ public class AuthLoginService {
 
         // 개인키 삭제
         this.sysRsaKeyRepository.deleteRsaKey(sessionKey);
+
+        // 로그인 이력 생성
+        SysLoginHistoryDvo loginDvo = new SysLoginHistoryDvo();
+        loginDvo.setEmpNo(empNo);
+        this.sysLoginHistoryRepository.insertLoginHistory(loginDvo);
     
         // 비밀번호 초기화인 경우 비밀번호 변경 처리 해야함
         String token = initYn == PrimeConstant.YN_Y ? "" : this.jwtProvider.createToken(dvo);
